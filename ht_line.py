@@ -1,7 +1,9 @@
 # Our Imports
 import matplotlib as plt
 import numpy as np
-import scipy as scp
+import scipy.signal
+
+from PIL import Image
 
 # Method Area [For creating methods]
 
@@ -40,15 +42,27 @@ def hough_transform():
 
     return None
 
+def load_image(filepath):
+    # Loads an image into a numpy array.
+    # Note: image will have 3 color channels [r, g, b].
+    img = Image.open(filepath)
+    return (np.asarray(img).astype(np.float)/255)[:, :]
+
 # Global Area [Just the area with we'll run our Code]
 
-# Grab our Test Images and convert into Numpy Arrays
+i_x = [[1, 0, -1],[1, 0, -1],[1, 0, 1]]
+i_y = [[1, 1, 1],[0, 0, 0],[-1, -1, -1]]
 
+# Grab our Test Images and convert into Numpy Arrays
+lines1 = load_image("test_images\lines1.png")
 
 # Take derivatives of the image to extract the Image Gradient
-
+lines_i_x = scipy.signal.convolve2d(lines1[:][:][0], i_x, mode='same')
+#lines1_i_x = scp.convolve2d(lines1, i_y)
 
 # Pass down necesssary arguments to hough_transform()
 # grab what it returns 
 
 # Draw Lines then add that layer ontop of the original image
+fig = plt.figure(figsize=(3, 3), dpi=300)
+plt.imshow(lines_i_x, cmap='gray')
