@@ -46,7 +46,7 @@ def load_image(filepath):
     # Loads an image into a numpy array.
     # Note: image will have 3 color channels [r, g, b].
     img = Image.open(filepath)
-    return (np.asarray(img).astype(np.float)/255)[:, :]
+    return (np.asarray(img).astype(np.float)/255)[:, :,:3]
 
 # Global Area [Just the area with we'll run our Code]
 
