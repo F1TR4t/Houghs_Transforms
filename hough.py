@@ -108,18 +108,19 @@ def convert_to_image(th, p):
     for i in range(len(th)):
         th_i = th[i]
         p_i = p[i]
+        
+        if ( th_i == 0 or th_i == 180):
 
-        if ( th_i == 0 or th_i == 180 ):
-            for ii in range(181):
-                x.append(ii)
-                y.append(0)
             continue
 
+        m = math.cos(math.pi * (th_i/180)) / math.sin(math.pi * (th_i/180))
+        b = p_i / math.sin(math.pi * (th_i/180))
+
         for ii in range(300):
-            j = round(( p_i - (ii * math.cos(th_i)) ) / math.sin(th_i))
+            j = round((m * ii) + b)
             if ( j >= 0 and j < 300 ):
-                x.append(ii)
                 y.append(j)
+                x.append(ii)
 
     return x, y
 
@@ -149,8 +150,6 @@ output = hough_transform(edges)
 
 # Grab the local maximas coords of our accumulator
 x, y = get_local_maxima(output, threshold=187)
-print(x)
-print(y)
 
 fig = plt.figure(figsize=(3, 3), dpi=300)
 plt.axis('off')
