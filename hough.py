@@ -67,7 +67,7 @@ def extract_edges(img):
 
     for x in range(img.shape[0]):
         for y in range(img.shape[1]):
-            if img[y, x] == 1:
+            if img[y, x] > 0.55:
                 out_x.append(x)
                 out_y.append(y)
     return out_x, out_y
@@ -82,6 +82,7 @@ l1_ed_mat = np.asarray(l1_edge).astype(np.float64)/255
 
 # Locate all edges within the Image, Edges should be white
 edges_x, edges_y = extract_edges(l1_ed_mat)
+
 # Pass down necesssary arguments to hough_transform()
 # grab what it returns 
 
