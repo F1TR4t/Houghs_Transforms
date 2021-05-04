@@ -110,7 +110,11 @@ def convert_to_image(th, p):
         p_i = p[i]
         
         if ( th_i == 0 or th_i == 180):
-
+            if (p_i < 0):
+                p_i = p_i * -1
+            for ii in range(300):
+                y.append(ii)
+                x.append(p_i)
             continue
 
         m = math.cos(math.pi * (th_i/180)) / math.sin(math.pi * (th_i/180))
@@ -149,7 +153,7 @@ edges_x, edges_y, edges = extract_edges(box_ed_mat)
 output = hough_transform(edges)
 
 # Grab the local maximas coords of our accumulator
-x, y = get_local_maxima(output, threshold=187)
+x, y = get_local_maxima(output, threshold=158)
 
 fig = plt.figure(figsize=(3, 3), dpi=300)
 plt.axis('off')
@@ -159,7 +163,8 @@ plt.savefig("out_images/box_sin.png", bbox_inches="tight")
 
 for i in range(len(y)):
     y[i] = y[i] - 300
-
+print(y)
+print(x)
 xi, yi = convert_to_image(x, y)
 # Take our points and convert them into our image space as lines
 
