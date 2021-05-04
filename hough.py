@@ -32,8 +32,8 @@ def extract_edges(img):
     out_y = []
     out = []
 
-    for x in range(img.shape[0]):
-        for y in range(img.shape[1]):
+    for x in range(2, img.shape[0]-2):
+        for y in range(2, img.shape[1]-2):
             if img[y, x] > 0.55:
                 out_x.append(x)
                 out_y.append(y)
@@ -163,8 +163,7 @@ plt.savefig("out_images/box_sin.png", bbox_inches="tight")
 
 for i in range(len(y)):
     y[i] = y[i] - 300
-print(y)
-print(x)
+
 xi, yi = convert_to_image(x, y)
 # Take our points and convert them into our image space as lines
 
@@ -172,5 +171,5 @@ xi, yi = convert_to_image(x, y)
 fig = plt.figure(figsize=(3, 3), dpi=300)
 plt.axis('off')
 plt.imshow(box)
-plt.plot(xi, yi, 'o', markersize=0.5, color='firebrick', fillstyle="none")
+plt.plot(xi, yi, 'o', markersize=0.5, linewidth=1, color='firebrick', fillstyle="none")
 plt.savefig("out_images/box_maxs.png", bbox_inches="tight")
