@@ -4,6 +4,7 @@ import numpy as np
 import math
 import matplotlib.pyplot as plt
 import scipy.interpolate
+import scipy.ndimage.filters as filters
 import scipy.signal
 from PIL import Image, ImageFilter
 
@@ -39,19 +40,46 @@ def extract_edges(img):
                 out.append([x, y])
     return out_x, out_y, out
 
+def get_local_maxima(data, threshold, do_return_values=False):
+    # See: https://stackoverflow.com/a/9113227/3672986
+    neighborhood_size = 3
+
+    data_region_max = filters.maximum_filter(data, neighborhood_size)
+    maxima = (data == data_region_max)
+    data_min = filters.minimum_filter(data, neighborhood_size)
+    maxima[data < threshold] = 0
+
+    labeled, num_objects = scipy.ndimage.label(maxima)
+    slices = scipy.ndimage.find_objects(labeled)
+    x, y, r = [], [], []
+    for dy, dx in slices:
+        x_center = int(round((dx.start + dx.stop - 1)/2))
+        x.append(x_center)
+        y_center = int(round((dy.start + dy.stop - 1)/2))   
+        y.append(y_center)
+        r.append(data[y_center, x_center])
+        
+    if do_return_values:
+        return x, y, r
+    else:
+        return x, y
+
 def hough_transform(edges, theta):
 
     # ------------------ Using Parameter Space (m, c) --------------------------
 
     # Quantize a Parameter Space, Map Input -> Output
     # Requires data (Our Image?, a set of points from every edge?)
-
-    accumulator = np.zeros((301, 181)) # Theta goes from 0 -> 180, p will have a max of 599 because of our image sizes
-
     # Instead of (m, c), use p = x * cos(theta) + y * sin(theta)
-    # Theta is from the Gradient, so now
     # Quantize to a parameter Space of A[theta_min, theta_max][p_min, p_max]
     # Choose Increments for Theta + p such that Noise isn't an issue and we don't miss any info
+
+    accumulator = np.zeros((301, 181)) # Theta goes from 0 -> 180, p will have a max of 300 because of our image sizes
+    
+    # Loop through the parameter space
+    # Note, we have edge points (x0, y0) -> (xn, yn)
+    # Use formula p = x * cos(theta) + y * sin(theta)
+    # A(theta, p) should be incremented
     for i in range(len(edges)): # I believe the for loop works and designs our sinusoids
         for th in range(181):
             x = (edges[i])[0]
@@ -60,16 +88,6 @@ def hough_transform(edges, theta):
             # Since we're keeping it from theta 0 -> 180 degrees, and p 0 -> 600, must keep it inside our window
             if ( p > 0 and p <= 300 ):
                 accumulator[p][th] = accumulator[p][th] + 1
-            
-
-
-    # Loop through the parameter space
-    # Note, we have edge points (x0, y0) -> (xn, yn)
-    # Use formula p = x * cos(theta) + y * sin(theta)
-    # A(theta, p) should be incremented
-
-
-    # Search for Local Maximas Throughout our Parameter Space
 
     return accumulator
 
@@ -83,11 +101,6 @@ lines1 = Image.open("test_images/lines1.png")
 # Gray Scale it
 l1_edge = lines1.convert("L")
 
-# Create our gradient
-l1_x = scipy.signal.convolve2d(l1_edge, s_x)
-l1_y = scipy.signal.convolve2d(l1_edge, s_y)
-l1_grad = l1_x + l1_y
-
 # Our Edge detection
 l1_edge = l1_edge.filter(ImageFilter.FIND_EDGES)
 l1_ed_mat = np.asarray(l1_edge).astype(np.float64)/255
@@ -99,11 +112,15 @@ edges_x, edges_y, edges = extract_edges(l1_ed_mat)
 # grab what it returns 
 output = hough_transform(edges, l1_grad)
 
+# Grab the local maximas coords of our accumulator
+x, y = get_local_maxima(output, threshold=150)
+
+
 
 # Draw Lines then add that layer ontop of the original image, save into out_images/
 fig = plt.figure(figsize=(3, 3), dpi=300)
 plt.axis('off')
 plt.imshow(output, cmap='gray')
 plt.savefig("out_images/lines1_output", bbox_inches="tight")
-#plt.plot(edges_x, edges_y, 'o', markersize=0.1, color='firebrick', fillstyle="none")
-#plt.savefig("out_images/lines1_edge", bbox_inches="tight")
+plt.plot(x, y, 'o', markersize=0.5, color='firebrick', fillstyle="none")
+plt.savefig("out_images/lines1_maximas", bbox_inches="tight")
