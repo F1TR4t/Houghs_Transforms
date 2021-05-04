@@ -46,20 +46,20 @@ def hough_transform(edges, theta):
     # Quantize a Parameter Space, Map Input -> Output
     # Requires data (Our Image?, a set of points from every edge?)
 
-    accumulator = np.zeros((601, 19)) # Theta goes from 0 -> 180, p will have a max of 599 because of our image sizes
+    accumulator = np.zeros((601, 181)) # Theta goes from 0 -> 180, p will have a max of 599 because of our image sizes
 
     # Instead of (m, c), use p = x * cos(theta) + y * sin(theta)
     # Theta is from the Gradient, so now
     # Quantize to a parameter Space of A[theta_min, theta_max][p_min, p_max]
     # Choose Increments for Theta + p such that Noise isn't an issue and we don't miss any info
     for i in range(len(edges)): # I believe the for loop works and designs our sinusoids
-        for th in range(19):
+        for th in range(181):
             x = (edges[i])[0]
             y = (edges[i])[1]
-            p = round(x * math.cos(math.pi*(th*10)/180) + y * math.sin(math.pi*(th*10)/180))
+            p = round(x * math.cos(math.pi*th/180) + y * math.sin(math.pi*th/180))
             # Since we're keeping it from theta 0 -> 180 degrees, and p 0 -> 600, must keep it inside our window
             if ( p > 0 and p <= 600 ):
-                accumulator[th][p] = accumulator[th][p] + 1
+                accumulator[p][th] = accumulator[p][th] + 1
             
 
 
