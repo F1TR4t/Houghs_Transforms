@@ -105,17 +105,22 @@ s_x = [[1, 0, -1],[2, 0, -2],[1, 0, -1]]
 s_y = [[1, 2, 1,],[0, 0, 0],[-1, -2, -1]]
 
 # Grab our Test Images
-lines1 = Image.open("test_images/lines1.png")
+#lines1 = Image.open("test_images/lines1.png")
+box = Image.open("test_images/box.png")
 
 # Gray Scale it
-l1_edge = lines1.convert("L")
+#l1_edge = lines1.convert("L")
+box_edge = box.convert("L")
 
 # Our Edge detection
-l1_edge = l1_edge.filter(ImageFilter.FIND_EDGES)
-l1_ed_mat = np.asarray(l1_edge).astype(np.float64)/255
+#l1_edge = l1_edge.filter(ImageFilter.FIND_EDGES)
+#l1_ed_mat = np.asarray(l1_edge).astype(np.float64)/255
+
+box_edge = box_edge.filter(ImageFilter.FIND_EDGES)
+box_ed_mat = np.asarray(box_edge).astype(np.float64)/255
 
 # Locate all edges within the Image, Edges should be white
-edges_x, edges_y, edges = extract_edges(l1_ed_mat)
+edges_x, edges_y, edges = extract_edges(box_ed_mat)
 
 # Pass down necesssary arguments to hough_transform()
 # grab what it returns 
@@ -129,7 +134,7 @@ x, y = get_local_maxima(output, threshold=175)
 # Draw Lines then add that layer ontop of the original image, save into out_images/
 fig = plt.figure(figsize=(3, 3), dpi=300)
 plt.axis('off')
-plt.imshow(output, cmap='gray')
-plt.savefig("out_images/lines1_output2", bbox_inches="tight")
+plt.imshow(output)
+plt.savefig("out_images/box_output2", bbox_inches="tight")
 plt.plot(x, y, 'o', markersize=0.5, color='firebrick', fillstyle="none")
-plt.savefig("out_images/lines1_maximas2", bbox_inches="tight")
+plt.savefig("out_images/box_maximas2", bbox_inches="tight")
