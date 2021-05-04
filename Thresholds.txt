@@ -1,0 +1,13 @@
+FilenameThreshold
+box	150
+lines1	
+lines2	250
+lines3	250
+road1	<40
+road2	<40
+road3	<40
+road4	<40
+road5	<40
+road6	<40
+road7	<40
+road8	<40

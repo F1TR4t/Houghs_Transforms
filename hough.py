@@ -129,10 +129,11 @@ def convert_to_image(th, p):
     return x, y
 
 # Global Area [Just the area with we'll run our Code]
+name = input("Which image would you like to load: ")
 
 # Grab our Test Images
 #lines1 = Image.open("test_images/lines1.png")
-box = Image.open("test_images/box.png")
+box = Image.open("test_images/" + name + ".png")
 
 # Gray Scale it
 #l1_edge = lines1.convert("L")
@@ -145,6 +146,11 @@ box_edge = box.convert("L")
 box_edge = box_edge.filter(ImageFilter.FIND_EDGES)
 box_ed_mat = np.asarray(box_edge).astype(np.float64)/255
 
+fig = plt.figure(figsize=(3, 3), dpi=300)
+plt.axis('off')
+plt.imshow(box_edge, cmap='gray')
+plt.savefig("out_images/" + name + "_edge.png", bbox_inches="tight")
+
 # Locate all edges within the Image, Edges should be white
 edges_x, edges_y, edges = extract_edges(box_ed_mat)
 
@@ -153,13 +159,14 @@ edges_x, edges_y, edges = extract_edges(box_ed_mat)
 output = hough_transform(edges)
 
 # Grab the local maximas coords of our accumulator
-x, y = get_local_maxima(output, threshold=158)
+trhd = int(input("Please enter the threshold: "))
+x, y = get_local_maxima(output, threshold=trhd)
 
 fig = plt.figure(figsize=(3, 3), dpi=300)
 plt.axis('off')
 plt.imshow(output)
 plt.plot(x, y, 'o', markersize=0.5, color='firebrick', fillstyle="none")
-plt.savefig("out_images/box_sin.png", bbox_inches="tight")
+plt.savefig("out_images/" + name + "_sin.png", bbox_inches="tight")
 
 for i in range(len(y)):
     y[i] = y[i] - 300
@@ -172,4 +179,4 @@ fig = plt.figure(figsize=(3, 3), dpi=300)
 plt.axis('off')
 plt.imshow(box)
 plt.plot(xi, yi, 'o', markersize=0.5, linewidth=1, color='firebrick', fillstyle="none")
-plt.savefig("out_images/box_maxs.png", bbox_inches="tight")
+plt.savefig("out_images/" + name + "_ht.png", bbox_inches="tight")
