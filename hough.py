@@ -46,7 +46,7 @@ def hough_transform(edges, theta):
     # Quantize a Parameter Space, Map Input -> Output
     # Requires data (Our Image?, a set of points from every edge?)
 
-    accumulator = np.zeros((601, 181)) # Theta goes from 0 -> 180, p will have a max of 599 because of our image sizes
+    accumulator = np.zeros((301, 181)) # Theta goes from 0 -> 180, p will have a max of 599 because of our image sizes
 
     # Instead of (m, c), use p = x * cos(theta) + y * sin(theta)
     # Theta is from the Gradient, so now
@@ -58,7 +58,7 @@ def hough_transform(edges, theta):
             y = (edges[i])[1]
             p = round(x * math.cos(math.pi*th/180) + y * math.sin(math.pi*th/180))
             # Since we're keeping it from theta 0 -> 180 degrees, and p 0 -> 600, must keep it inside our window
-            if ( p > 0 and p <= 600 ):
+            if ( p > 0 and p <= 300 ):
                 accumulator[p][th] = accumulator[p][th] + 1
             
 
