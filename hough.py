@@ -42,7 +42,7 @@ def extract_edges(img):
 
 def get_local_maxima(data, threshold, do_return_values=False):
     # See: https://stackoverflow.com/a/9113227/3672986
-    neighborhood_size = 3
+    neighborhood_size = 10
 
     data_region_max = filters.maximum_filter(data, neighborhood_size)
     maxima = (data == data_region_max)
@@ -54,9 +54,9 @@ def get_local_maxima(data, threshold, do_return_values=False):
     x, y, r = [], [], []
     for dy, dx in slices:
         x_center = int(round((dx.start + dx.stop - 1)/2))
-        x.append(x_center-180)
+        x.append(x_center)
         y_center = int(round((dy.start + dy.stop - 1)/2))   
-        y.append(y_center-300)
+        y.append(y_center)
         r.append(data[y_center, x_center])
         
     if do_return_values:
@@ -75,7 +75,7 @@ def hough_transform(edges):
     # Choose Increments for Theta + p such that Noise isn't an issue and we don't miss any info
 
     #accumulator = np.zeros((301, 181)) # Theta goes from 0 -> 180, p will have a max of 300 because of our image sizes
-    accumulator = np.zeros((601, 361))
+    accumulator = np.zeros((601, 181))
 
     # 0 -> 299 represents -300 -> -1
     # 300 represents 0
@@ -90,10 +90,10 @@ def hough_transform(edges):
     # Use formula p = x * cos(theta) + y * sin(theta)
     # A(theta, p) should be incremented
     for i in range(len(edges)): # I believe the for loop works and designs our sinusoids
-        for th in range(361):
+        for th in range(181):
             x = (edges[i])[0]
             y = (edges[i])[1]
-            p = round(x * math.cos(math.pi*(th-180)/180) + y * math.sin(math.pi*(th-180)/180))
+            p = round(x * math.cos(math.pi*(th)/180) + y * math.sin(math.pi*(th)/180))
             # Since we're keeping it from theta 0 -> 180 degrees, and p 0 -> 600, must keep it inside our window
             if ( p >= -300 and p <= 300 ):
                 accumulator[p+300][th] = accumulator[p+300][th] + 1
@@ -110,10 +110,13 @@ def convert_to_image(th, p):
         p_i = p[i]
 
         if ( th_i == 0 or th_i == 180 ):
+            for ii in range(181):
+                x.append(ii)
+                y.append(0)
             continue
 
         for ii in range(300):
-            j = round((p_i - ii * math.cos(th_i)) / math.sin(th_i))
+            j = round(( p_i - (ii * math.cos(th_i)) ) / math.sin(th_i))
             if ( j >= 0 and j < 300 ):
                 x.append(ii)
                 y.append(j)
@@ -145,7 +148,19 @@ edges_x, edges_y, edges = extract_edges(box_ed_mat)
 output = hough_transform(edges)
 
 # Grab the local maximas coords of our accumulator
-x, y = get_local_maxima(output, threshold=190)
+x, y = get_local_maxima(output, threshold=187)
+print(x)
+print(y)
+
+fig = plt.figure(figsize=(3, 3), dpi=300)
+plt.axis('off')
+plt.imshow(output)
+plt.plot(x, y, 'o', markersize=0.5, color='firebrick', fillstyle="none")
+plt.savefig("out_images/box_sin.png", bbox_inches="tight")
+
+for i in range(len(y)):
+    y[i] = y[i] - 300
+
 xi, yi = convert_to_image(x, y)
 # Take our points and convert them into our image space as lines
 
@@ -153,6 +168,5 @@ xi, yi = convert_to_image(x, y)
 fig = plt.figure(figsize=(3, 3), dpi=300)
 plt.axis('off')
 plt.imshow(box)
-plt.savefig("out_images/box.png", bbox_inches="tight")
 plt.plot(xi, yi, 'o', markersize=0.5, color='firebrick', fillstyle="none")
-plt.savefig("out_images/box_max.png", bbox_inches="tight")
+plt.savefig("out_images/box_maxs.png", bbox_inches="tight")
