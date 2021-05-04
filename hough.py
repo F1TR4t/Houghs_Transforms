@@ -64,7 +64,7 @@ def get_local_maxima(data, threshold, do_return_values=False):
     else:
         return x, y
 
-def hough_transform(edges, theta):
+def hough_transform(edges):
 
     # ------------------ Using Parameter Space (m, c) --------------------------
 
@@ -74,20 +74,29 @@ def hough_transform(edges, theta):
     # Quantize to a parameter Space of A[theta_min, theta_max][p_min, p_max]
     # Choose Increments for Theta + p such that Noise isn't an issue and we don't miss any info
 
-    accumulator = np.zeros((301, 181)) # Theta goes from 0 -> 180, p will have a max of 300 because of our image sizes
-    
+    #accumulator = np.zeros((301, 181)) # Theta goes from 0 -> 180, p will have a max of 300 because of our image sizes
+    accumulator = np.zeros((601, 361))
+
+    # 0 -> 299 represents -300 -> -1
+    # 300 represents 0
+    # 301 -> 600 represents 1 -> 300
+
+    # 0 -> 179 represents - 180 -> -1
+    # 180 represents 0
+    # 181 -> 360 represents 1 -> 180
+
     # Loop through the parameter space
     # Note, we have edge points (x0, y0) -> (xn, yn)
     # Use formula p = x * cos(theta) + y * sin(theta)
     # A(theta, p) should be incremented
     for i in range(len(edges)): # I believe the for loop works and designs our sinusoids
-        for th in range(181):
+        for th in range(361):
             x = (edges[i])[0]
             y = (edges[i])[1]
-            p = round(x * math.cos(math.pi*th/180) + y * math.sin(math.pi*th/180))
+            p = round(x * math.cos(math.pi*(th-180)/180) + y * math.sin(math.pi*(th-180)/180))
             # Since we're keeping it from theta 0 -> 180 degrees, and p 0 -> 600, must keep it inside our window
-            if ( p > 0 and p <= 300 ):
-                accumulator[p][th] = accumulator[p][th] + 1
+            if ( p >= -300 and p <= 300 ):
+                accumulator[p+300][th] = accumulator[p+300][th] + 1
 
     return accumulator
 
@@ -110,17 +119,17 @@ edges_x, edges_y, edges = extract_edges(l1_ed_mat)
 
 # Pass down necesssary arguments to hough_transform()
 # grab what it returns 
-output = hough_transform(edges, l1_grad)
+output = hough_transform(edges)
 
 # Grab the local maximas coords of our accumulator
-x, y = get_local_maxima(output, threshold=150)
+x, y = get_local_maxima(output, threshold=175)
 
-
+# Take our points and convert them into our image space as lines
 
 # Draw Lines then add that layer ontop of the original image, save into out_images/
 fig = plt.figure(figsize=(3, 3), dpi=300)
 plt.axis('off')
 plt.imshow(output, cmap='gray')
-plt.savefig("out_images/lines1_output", bbox_inches="tight")
+plt.savefig("out_images/lines1_output2", bbox_inches="tight")
 plt.plot(x, y, 'o', markersize=0.5, color='firebrick', fillstyle="none")
-plt.savefig("out_images/lines1_maximas", bbox_inches="tight")
+plt.savefig("out_images/lines1_maximas2", bbox_inches="tight")
