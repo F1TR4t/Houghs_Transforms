@@ -121,7 +121,7 @@ def convert_to_image(th, p):
         b = p_i / math.sin(math.pi * (th_i/180))
 
         for ii in range(300):
-            j = round((m * ii) + b)
+            j = round(b - (m * ii))
             if ( j >= 0 and j < 300 ):
                 y.append(j)
                 x.append(ii)
