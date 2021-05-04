@@ -54,9 +54,9 @@ def get_local_maxima(data, threshold, do_return_values=False):
     x, y, r = [], [], []
     for dy, dx in slices:
         x_center = int(round((dx.start + dx.stop - 1)/2))
-        x.append(x_center)
+        x.append(x_center-180)
         y_center = int(round((dy.start + dy.stop - 1)/2))   
-        y.append(y_center)
+        y.append(y_center-300)
         r.append(data[y_center, x_center])
         
     if do_return_values:
@@ -100,9 +100,27 @@ def hough_transform(edges):
 
     return accumulator
 
+def convert_to_image(th, p):
+
+    x = []
+    y = []
+
+    for i in range(len(th)):
+        th_i = th[i]
+        p_i = p[i]
+
+        if ( th_i == 0 or th_i == 180 ):
+            continue
+
+        for ii in range(300):
+            j = round((p_i - ii * math.cos(th_i)) / math.sin(th_i))
+            if ( j >= 0 and j < 300 ):
+                x.append(ii)
+                y.append(j)
+
+    return x, y
+
 # Global Area [Just the area with we'll run our Code]
-s_x = [[1, 0, -1],[2, 0, -2],[1, 0, -1]]
-s_y = [[1, 2, 1,],[0, 0, 0],[-1, -2, -1]]
 
 # Grab our Test Images
 #lines1 = Image.open("test_images/lines1.png")
@@ -127,14 +145,14 @@ edges_x, edges_y, edges = extract_edges(box_ed_mat)
 output = hough_transform(edges)
 
 # Grab the local maximas coords of our accumulator
-x, y = get_local_maxima(output, threshold=175)
-
+x, y = get_local_maxima(output, threshold=190)
+xi, yi = convert_to_image(x, y)
 # Take our points and convert them into our image space as lines
 
 # Draw Lines then add that layer ontop of the original image, save into out_images/
 fig = plt.figure(figsize=(3, 3), dpi=300)
 plt.axis('off')
-plt.imshow(output)
-plt.savefig("out_images/box_output2", bbox_inches="tight")
-plt.plot(x, y, 'o', markersize=0.5, color='firebrick', fillstyle="none")
-plt.savefig("out_images/box_maximas2", bbox_inches="tight")
+plt.imshow(box)
+plt.savefig("out_images/box.png", bbox_inches="tight")
+plt.plot(xi, yi, 'o', markersize=0.5, color='firebrick', fillstyle="none")
+plt.savefig("out_images/box_max.png", bbox_inches="tight")
