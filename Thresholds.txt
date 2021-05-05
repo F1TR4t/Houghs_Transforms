@@ -1,6 +1,6 @@
 FilenameThreshold
 box	150
-lines1	???
+lines1	150
 lines2	250
 lines3	250
 road1	40

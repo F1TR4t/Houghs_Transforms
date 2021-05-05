@@ -10,22 +10,6 @@ from PIL import Image, ImageFilter
 
 # Method Area [For creating methods]
 
-def load_image(filepath):
-    """Loads an image into a numpy array.
-    Note: image will have 3 color channels [r, g, b]."""
-    img = Image.open(filepath)
-    return (np.asarray(img).astype(np.float64)/255)[:, :, :3]
-
-def load_image_gray(filepath):
-    """Loads an image into a numpy array.
-    Note: image will have 3 color channels [r, g, b]."""
-    img = Image.open(filepath)
-    img = img.convert("L")
-    img.save("out_images/grey_lines1.png")
-    img = img.filter(ImageFilter.FIND_EDGES)
-    img.save("out_images/edge_lines1.png")
-    return (np.asarray(img).astype(np.float64)/255)[:, :]
-
 # Go through our Inputted Image Matrix and extract all edges (white locations)
 def extract_edges(img):
     out_x = []
@@ -66,7 +50,7 @@ def get_local_maxima(data, threshold, do_return_values=False):
 
 def hough_transform(edges):
 
-    # ------------------ Using Parameter Space (m, c) --------------------------
+    # ------------------ Using Parameter Space (theta, p) --------------------------
 
     # Quantize a Parameter Space, Map Input -> Output
     # Requires data (Our Image?, a set of points from every edge?)
