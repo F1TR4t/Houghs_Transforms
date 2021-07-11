@@ -3,7 +3,6 @@
 import numpy as np
 import math
 import matplotlib.pyplot as plt
-import scipy.interpolate
 import scipy.ndimage.filters as filters
 import scipy.signal
 from PIL import Image, ImageFilter
@@ -133,7 +132,7 @@ box_ed_mat = np.asarray(box_edge).astype(np.float64)/255
 fig = plt.figure(figsize=(3, 3), dpi=300)
 plt.axis('off')
 plt.imshow(box_edge, cmap='gray')
-plt.savefig("out_images/" + name + "_edge.png", bbox_inches="tight")
+plt.savefig("out_images/" + name + "_sin.png", bbox_inches="tight")
 
 # Locate all edges within the Image, Edges should be white
 edges_x, edges_y, edges = extract_edges(box_ed_mat)
@@ -159,8 +158,16 @@ xi, yi = convert_to_image(x, y)
 # Take our points and convert them into our image space as lines
 
 # Draw Lines then add that layer ontop of the original image, save into out_images/
-fig = plt.figure(figsize=(3, 3), dpi=300)
+fig = plt.figure(figsize=(10, 10), dpi=200)
 plt.axis('off')
+ax = plt.subplot(231)
+ax.set_axis_off()
+plt.imshow(box)
+ax = plt.subplot(232)
+ax.set_axis_off()
+plt.imshow(box_edge, cmap='gray')
+ax = plt.subplot(233)
+ax.set_axis_off()
 plt.imshow(box)
 plt.plot(xi, yi, 'o', markersize=0.5, linewidth=1, color='firebrick', fillstyle="none")
-plt.savefig("out_images/" + name + "_ht.png", bbox_inches="tight")
+plt.savefig("out_images/" + name + "_out.png", bbox_inches="tight")
